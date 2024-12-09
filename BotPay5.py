@@ -30,6 +30,19 @@ CHANNEL_ID = "-1001709871902"  # Замените на chat_id вашего ка
 
 PRICES = {1: 2, 6: 10, 12: 20}  # Цены подписок
 
+@app.route('/telegram_webhook', methods=['POST'])
+def telegram_webhook():
+    try:
+        # Получаем данные от Telegram
+        json_str = request.get_data(as_text=True)
+        print(f"Полученные данные Telegram: {json_str}")
+        update = telebot.types.Update.de_json(json_str)
+        bot.process_new_updates([update])  # Обрабатываем запросы
+        return 'OK', 200
+    except Exception as e:
+        print(f"Ошибка вебхука Telegram: {e}")
+        return 'Bad Request', 400
+
 @app.route('/stripe_webhook', methods=['POST'])
 def stripe_webhook():
     payload = request.get_data(as_text=True)
