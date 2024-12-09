@@ -34,7 +34,7 @@ PRICES = {1: 2, 6: 10, 12: 20}  # Цены подписок
 def stripe_webhook():
     payload = request.get_data(as_text=True)
     sig_header = request.headers.get('Stripe-Signature')
-    endpoint_secret = 'whsec_OnXcZzfhX4CTzOLpiOlQvCyAuql0Ipgi'
+    endpoint_secret = 'whsec_z9DPMCBDw5GazR6nk8KMw8VV97hjtg12'
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
     except (ValueError, stripe.error.SignatureVerificationError) as e:
