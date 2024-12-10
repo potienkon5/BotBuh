@@ -74,7 +74,7 @@ def stripe_webhook():
         user_info = bot.get_chat(user_id)
         username = user_info.username or f"user?id={user_id}"
         admin_message = f"Пользователь с номером +{phone_number} оплатил подписку на {int(duration * 30) if duration != 0.002083 else 'тест 3 минут'}."
-        bot.send_message(admin_id, admin_id2, admin_message)
+        bot.send_message(admin_id, admin_message)
 
         if duration == 0.002083:
             threading.Thread(target=remove_user_after_timeout, args=(user_id, 60)).start()
@@ -272,7 +272,7 @@ def notify_admin_of_expiration(user_id, phone_number):
     user_info = bot.get_chat(user_id)
     username = user_info.username or f"user?id={user_id}"
     admin_message = f"Подписка у пользователя с номером +{phone_number} и username @{username} истекла."
-    bot.send_message(admin_id, admin_id2, admin_message)
+    bot.send_message(admin_id, admin_message)
 
 def run_bot():
     bot.remove_webhook()
