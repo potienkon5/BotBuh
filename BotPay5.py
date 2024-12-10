@@ -153,7 +153,7 @@ def payment_process(call):
             'quantity': 1,
         }],
         mode='payment',
-        success_url='https://t.me/+nF4uweCl7aVhMWQy',
+        success_url='https://t.me/+OpXinoD8du43NmYy',
         cancel_url='https://t.me/pay_chanel_bot',
         metadata={'user_id': user_id, 'duration': duration}
     )
