@@ -3,3 +3,4 @@ pyTelegramBotAPI
 stripe
 gunicorn
 telebot
+psycopg2
