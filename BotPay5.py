@@ -1,8 +1,8 @@
 import telebot
+import psycopg2
 import stripe
 import threading
 import time
-import sqlite3
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 
@@ -11,17 +11,19 @@ app = Flask(__name__)
 bot = telebot.TeleBot('7866110241:AAEMk7X2Kkr-TKhoB1QrdL2UBfCCfN8mHMY')
 stripe.api_key = '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'
 
-# Подключение к базе данных
-conn = sqlite3.connect('users.db', check_same_thread=False)
+# Подключение к PostgreSQL
+DATABASE_URL = "postgresql://postgres:tTttwFfNDbONtnexXwbovvGnoflaPWyw@autorack.proxy.rlwy.net:15908/railway"
+conn = psycopg2.connect(DATABASE_URL)
 cursor = conn.cursor()
-cursor.execute('DROP TABLE IF EXISTS users')
-cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-    user_id INTEGER PRIMARY KEY,
+
+# Создание таблицы users
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS users (
+    user_id BIGINT PRIMARY KEY,
     phone_number TEXT,
-    expiration TEXT
-)''')
-cursor.execute("PRAGMA table_info(users)")
-print(cursor.fetchall())
+    expiration TIMESTAMP
+)
+''')
 conn.commit()
 
 admin_id = 920716848  # Замените на числовой ID администратора
@@ -41,7 +43,6 @@ def telegram_webhook():
         return 'OK', 200
     except Exception as e:
         print(f"Ошибка вебхука Telegram: {e}")
-        print("Webhook вызван")
         return 'Bad Request', 400
 
 @app.route('/stripe_webhook', methods=['POST'])
@@ -61,24 +62,26 @@ def stripe_webhook():
         duration = float(session['metadata']['duration'])
         expiration_date = datetime.now() + (timedelta(minutes=3) if duration == 0.002083 else timedelta(days=30 * duration))
         
-        cursor.execute('UPDATE users SET expiration = ? WHERE user_id = ?', (expiration_date.isoformat(), user_id))
+        # Обновление данных в PostgreSQL
+        cursor.execute('''
+        INSERT INTO users (user_id, phone_number, expiration)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (user_id) DO UPDATE SET expiration = EXCLUDED.expiration
+        ''', (user_id, None, expiration_date))
         conn.commit()
 
         # Получение номера телефона из базы
-        cursor.execute('SELECT phone_number FROM users WHERE user_id = ?', (user_id,))
+        cursor.execute('SELECT phone_number FROM users WHERE user_id = %s', (user_id,))
         phone_result = cursor.fetchone()
         phone_number = phone_result[0] if phone_result else "не указан"
 
-         # Уведомление пользователя и админа
+        # Уведомление пользователя и админа
         message = f"Оплата успешна! Вы получили доступ на {int(duration * 1)} месяц(ев)." if duration != 0.002083 else "Вы получили тест доступ на 3 минут."
         bot.send_message(user_id, message)
         user_info = bot.get_chat(user_id)
         username = user_info.username or f"user?id={user_id}"
-        admin_message = f"Пользователь с номером +{phone_number} оплатил подписку на {int(duration * 1)} месяц(ев)." if duration != 0.002083 else 'тест 3 минут'
+        admin_message = f"Пользователь с номером +{phone_number} оплатил подписку на {int(duration * 1)} месяц(ев)." if duration != 0.002083 else "тест 3 минут."
         bot.send_message(admin_id, admin_message)
-
-        if duration == 0.002083:
-            threading.Thread(target=remove_user_after_timeout, args=(user_id, 60)).start()
 
     return jsonify(success=True), 200
 
