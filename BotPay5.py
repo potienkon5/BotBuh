@@ -184,7 +184,7 @@ pending_payments = {}
 
 def check_payment_status(user_id):
     # Ожидание времени на оплату (например, 5 минут)
-    time.sleep(150)  # 150 секунд = 2,5 минуты
+    time.sleep(3600)  # 150 секунд = 2,5 минуты
 
     # Проверка, осталась ли запись в `pending_payments`
     if user_id in pending_payments:
