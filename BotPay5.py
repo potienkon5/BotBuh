@@ -105,8 +105,14 @@ def handle_contact(message):
         user_id = message.from_user.id
 
         # Сохранение номера телефона в базу данных
-        cursor.execute('INSERT OR REPLACE INTO users (user_id, phone_number, expiration) VALUES (?, ?, ?)',
-                       (user_id, phone_number, None))
+                # Сохранение номера телефона в PostgreSQL
+        cursor.execute('''
+        INSERT INTO users (user_id, phone_number, expiration)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (user_id) DO UPDATE SET 
+            phone_number = EXCLUDED.phone_number,
+            expiration = EXCLUDED.expiration
+        ''', (user_id, phone_number, None))
         conn.commit()
 
         # Переход к выбору подписки
