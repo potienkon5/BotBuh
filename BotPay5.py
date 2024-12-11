@@ -70,11 +70,11 @@ def stripe_webhook():
         phone_number = phone_result[0] if phone_result else "не указан"
 
          # Уведомление пользователя и админа
-        message = f"Оплата успешна! Вы получили доступ на {int(duration * 30)} месяц(ев)." if duration != 0.002083 else "Вы получили тест доступ на 3 минут."
+        message = f"Оплата успешна! Вы получили доступ на {int(duration * 1)} месяц(ев)." if duration != 0.002083 else "Вы получили тест доступ на 3 минут."
         bot.send_message(user_id, message)
         user_info = bot.get_chat(user_id)
         username = user_info.username or f"user?id={user_id}"
-        admin_message = f"Пользователь с номером +{phone_number} оплатил подписку на {int(duration * 1)} месяц(ев)." if duration != 0.002083 else 'тест 3 минут'}."
+        admin_message = f"Пользователь с номером +{phone_number} оплатил подписку на {int(duration * 1)} месяц(ев)." if duration != 0.002083 else 'тест 3 минут'
         bot.send_message(admin_id, admin_message)
 
         if duration == 0.002083:
