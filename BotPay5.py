@@ -130,7 +130,7 @@ def handle_contact(message):
 def subscribe_command(call):
     # Проверка, есть ли номер телефона у пользователя
     user_id = call.message.chat.id
-    cursor.execute('SELECT phone_number FROM users WHERE user_id = ?', (user_id,))
+    cursor.execute('SELECT phone_number FROM users WHERE user_id = %s', (user_id,))
     result = cursor.fetchone()
 
     if result and result[0]:  # Если номер телефона существует
