@@ -157,7 +157,7 @@ def payment_process(call):
         line_items=[{
             'price_data': {
                 'currency': 'eur',
-                'product_data': {'name': f'Подписка на {int(duration * 30) if duration != 0.002083 else 1} {("3 минут" if duration == 0.002083 else "месяц(ев)")}'},
+                'product_data': {'name': f'Подписка на {int(duration * 1) if duration != 0.002083 else 1} {("3 минут" if duration == 0.002083 else "месяц(ев)")}'},
                 'unit_amount': int(price * 100),
             },
             'quantity': 1,
