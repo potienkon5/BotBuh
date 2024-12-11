@@ -219,7 +219,7 @@ def check_payment_status(user_id):
 # Удаление пользователя по истечении подписки
 def remove_user_after_timeout(user_id, minutes):
     time.sleep(minutes * 60)
-    cursor.execute('DELETE FROM users WHERE user_id = ?', (user_id,))
+    cursor.execute('DELETE FROM users WHERE user_id = %s', (user_id,))
     conn.commit()
 
 # Запуск напоминания в отдельном потоке
@@ -271,7 +271,7 @@ def remind_users(func=lambda call: call.data == "subscribe"):
                             print(f"Пользователь {user_id} удален из канала {CHANNEL_ID}")
                         except Exception as e:
                             print(f"Ошибка при удалении пользователя {user_id} из канала: {e}")
-                        cursor.execute('DELETE FROM users WHERE user_id = ?', (user_id,))
+                        cursor.execute('DELETE FROM users WHERE user_id = %s', (user_id,))
                         conn.commit()
                 except ValueError:
                     print(f"Некорректное значение expiration для пользователя {user_id}: {expiration}")
