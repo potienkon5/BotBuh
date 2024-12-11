@@ -41,6 +41,7 @@ def telegram_webhook():
         return 'OK', 200
     except Exception as e:
         print(f"Ошибка вебхука Telegram: {e}")
+        print("Webhook вызван")
         return 'Bad Request', 400
 
 @app.route('/stripe_webhook', methods=['POST'])
@@ -73,7 +74,7 @@ def stripe_webhook():
         bot.send_message(user_id, message)
         user_info = bot.get_chat(user_id)
         username = user_info.username or f"user?id={user_id}"
-        admin_message = f"Пользователь с номером +{phone_number} оплатил подписку на {int(duration * 30) if duration != 0.002083 else 'тест 3 минут'}."
+        admin_message = f"Пользователь с номером +{phone_number} оплатил подписку на {int(duration * 1)} месяц(ев)." if duration != 0.002083 else 'тест 3 минут'}."
         bot.send_message(admin_id, admin_message)
 
         if duration == 0.002083:
@@ -190,6 +191,7 @@ def check_payment_status(user_id):
                 return
         except Exception as e:
             print(f"Ошибка проверки статуса оплаты в Stripe: {e}")
+            print(f"Проверка платежа пользователя {user_id}: статус {session.payment_status}")
 
         # Если платеж не завершен, отправляем сообщение пользователю
         markup = telebot.types.InlineKeyboardMarkup()
